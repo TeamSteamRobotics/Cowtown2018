@@ -1,7 +1,11 @@
 package frc.team5119.robot.autonomous;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.team5119.robot.Robot;
 import edu.wpi.first.wpilibj.DriverStation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AutonomousInit {
 
@@ -24,22 +28,28 @@ public class AutonomousInit {
 	 *  |     pos2       |                  -------                  |       pos0     |
 	 *  |________________|___________________________________________|________________|
 	 */
+	private static final boolean GOINGFORSWITCH = true;
 	
 	public void init() {
+
+	    Strategy.buildStrategy();
 		
 		//position = autonomousSwitchPosition
-		Strategy.position = Robot.autoSwitchSubsystem.getPosition();
+		int position = Robot.autoSwitchSubsystem.getPosition();
 		
 		String gameData;
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		
-		//closest switch to the alliance
-		Switch.init(gameData.charAt(0), true);
-		
-		//the only scale
-		Scale.init(gameData.charAt(1), (Strategy.position == 0 && gameData.charAt(1) == 'L') || (Strategy.position == 2 && gameData.charAt(1) == 'R')); //sets scale to priority if it is on the same side as us
 
-		//the movements based on if going for the switch or scale and position
-		Robot.strategy.init();
+        List<Object> switchPlan = (gameData.charAt(0) == 'L') ? Strategy.getSwitchLeft(position) : Strategy.getSwitchRight(position);
+        List<Object> scalePlan = (gameData.charAt(1) == 'L') ?  Strategy.getScaleLeft(position) : Strategy.getScaleRight(position);
+
+        if (GOINGFORSWITCH) {
+            SmartDashboard.putString("plan", "switchPlan");
+            Robot.strategy.execute(switchPlan);
+        }
+        else {
+            SmartDashboard.putString("plan", "scalePlan");
+            Robot.strategy.execute(scalePlan);
+        }
 	}
 }
