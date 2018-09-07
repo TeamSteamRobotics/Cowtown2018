@@ -58,10 +58,10 @@ public class Strategy extends CommandGroup {
 
 		for(int i= 0; i < movementList.size(); i++) {
 		    if (movementList.get(i) instanceof String) {
-                addSequential(new AutonomousStraight(1.0, Double.parseDouble( (String) movementList.get(i)) ));
+                addSequential(new AutonomousStraight( Double.parseDouble( (String) movementList.get(i)) ));
             }
             else if (movementList.get(i) instanceof Double) {
-                addSequential(new AutonomousTurn((double) movementList.get(i)));
+                addSequential(new AutonomousTurn(1.0, (double) movementList.get(i)));
             }
             else {
                 addParallel( (Command) movementList.get(i));
